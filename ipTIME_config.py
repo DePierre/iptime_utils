@@ -13,7 +13,7 @@ __author__ = 'Tao "depierre" Sauvage'
 
 HEADER_SIZE = 0x30
 MAGIC_INDEX = 0
-MAGIC_STRING = 'raw_nv'
+MAGIC_STRING = b'raw_nv'
 SIZE_COMPRESSED_INDEX = 0x10
 SUM_INDEX = 0x14
 VERSION_INDEX = 0x18
@@ -38,19 +38,19 @@ def dump_header(header):
 
 def compute_sum(gz):
     """Simple sum of bytes in gzip file used as a checksum by ipTIME."""
-    res = sum(ord(c) for c in gz)
+    res = sum(c for c in bytearray(gz))
     logging.info('\t\tComputed sum: 0x%04X' % res)
     return res
 
 
 def build_header(gz):
     """Build ipTIME custom header."""
-    header = MAGIC_STRING + '\x00' * (16 - len(MAGIC_STRING))
+    header = MAGIC_STRING + b'\x00' * (16 - len(MAGIC_STRING))
     header += struct.pack('<I', len(gz))
     header += struct.pack('<I', compute_sum(gz))
     header += struct.pack('<I', 0x7FD0)
     header += struct.pack('<I', 0x10000)
-    header += '\x00' * 16
+    header += b'\x00' * 16
     return header
 
 
@@ -61,7 +61,7 @@ def extract(filename):
         outer_gz = f.read()
     # Bug in ipTIME?
     # Sometimes the configuration file starts with 0x0d 0x0a, which seem to be from the HTTP header, not the conf
-    if outer_gz.startswith('\x0d\x0a'):
+    if outer_gz.startswith(b'\x0d\x0a'):
         logging.info('\t [~] Removing \\r\\n at the beginning of config file (bug in ipTIME firmware).')
         outer_gz = outer_gz[2:]
     # 1. First layer is gzip and contains ipTIME custom header and the tar.gz configuration files
@@ -103,17 +103,17 @@ def pack(filename):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(message)s')
-    logging.info(u'PoC for extracting/repacking ipTIME backup configuration file')
-    logging.warning(u'Warning: only tested on ipTIME n704 v3, firmware version 9.98.6')
+    logging.info('PoC for extracting/repacking ipTIME backup configuration file')
+    logging.warning('Warning: only tested on ipTIME n704 v3, firmware version 9.98.6')
 
     if len(sys.argv) < 3:
-        logging.error(u'Usage: %s -e|-c <config.cfg>' % sys.argv[0])
+        logging.error('Usage: %s -e|-c <config.cfg>' % sys.argv[0])
         sys.exit(-1)
 
-    if sys.argv[1] == u'-e':  # Extraction
+    if sys.argv[1] == '-e':  # Extraction
         extract(sys.argv[2])
         logging.info('Extraction successful. You can now edit configuration files in ./etc/')
         logging.info('Use -c to pack the new configuration')
-    elif sys.argv[1] == u'-c':  # Repack
+    elif sys.argv[1] == '-c':  # Repack
         pack(sys.argv[2])
         logging.info('Packing successful. You can now upload the configuration file to ipTIME router.')
