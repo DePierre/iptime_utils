@@ -106,7 +106,7 @@ if __name__ == '__main__':
     logging.info('PoC for extracting/repacking ipTIME backup configuration file')
     logging.warning('Warning: only tested on ipTIME n704 v3, firmware version 9.98.6')
 
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 3 or (len(sys.argv) == 2 and sys.argv[1] in ['-h', '--h', '--help']):
         logging.error('Usage: %s -e|-c <config.cfg>' % sys.argv[0])
         sys.exit(-1)
 
