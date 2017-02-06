@@ -16,7 +16,7 @@ MAGIC_INDEX = 0
 MAGIC_STRING = b'raw_nv'
 SIZE_COMPRESSED_INDEX = 0x10
 SUM_INDEX = 0x14
-VERSION_INDEX = 0x18
+MAXSIZE_INDEX = 0x18
 FS_ID_INDEX = 0x1c
 
 
@@ -27,12 +27,12 @@ def dump_header(header):
         logging.warning('\t[~] magic string is different: %s %s' % (magic_string, MAGIC_STRING))
     size = header[SIZE_COMPRESSED_INDEX:SIZE_COMPRESSED_INDEX + 4]
     sum_gz = header[SUM_INDEX:SUM_INDEX + 4]
-    version = header[VERSION_INDEX:VERSION_INDEX + 4]
+    max_size = header[MAXSIZE_INDEX:MAXSIZE_INDEX + 4]
     fs_id = header[FS_ID_INDEX:FS_ID_INDEX + 4]
     logging.info('\t\tMagic: %s' % magic_string)
     logging.info('\t\tSize of gz (compressed): %d' % struct.unpack('<I', size))
     logging.info('\t\tSum of gz bytes: 0x%04X' % struct.unpack('<I', sum_gz))
-    logging.info('\t\tVersion(?): 0x%04X' % struct.unpack('<I', version))
+    logging.info('\t\tMax size: %d' % struct.unpack('<I', max_size))
     logging.info('\t\tFS id: 0x%04X' % struct.unpack('<I', fs_id))
 
 
@@ -48,7 +48,7 @@ def build_header(gz):
     header = MAGIC_STRING + b'\x00' * (16 - len(MAGIC_STRING))
     header += struct.pack('<I', len(gz))
     header += struct.pack('<I', compute_sum(gz))
-    header += struct.pack('<I', 0x7FD0)
+    header += struct.pack('<I', 0x7FD0)  # Maximum size
     header += struct.pack('<I', 0x10000)
     header += b'\x00' * 16
     return header
