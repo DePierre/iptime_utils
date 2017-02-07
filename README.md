@@ -2,8 +2,8 @@
 
 ## Configuration File Extraction/Re-packing
 
-The python script `ipTIME_config.py` can extract/re-pack the configuration backup downloaded from the ipTIME (tested
-on n704) router interface.
+The python script `ipTIME_config.py` can extract/re-pack the configuration backup file downloaded from the ipTIME
+router's web interface (tested on n704).
 
 Example:
 
@@ -17,7 +17,7 @@ Extracting ipTIME configuration...
 		Magic: raw_nv
 		Size of gz (compressed): 3183
 		Sum of gz bytes: 0x677A4
-		Version(?): 0x7FD0
+		Max size: 32720
 		FS id: 0x10000
 	[+] Extracting inner tar.gz tarball
 Extraction successful. You can now edit configuration files in ./etc/
